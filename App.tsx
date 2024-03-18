@@ -8,20 +8,20 @@ import {
 import { StatusBar } from 'expo-status-bar';
 import { NativeBaseProvider } from 'native-base';
 
+import { Loading } from '@/components/Loading';
+
+import { theme } from '@/theme';
+
 export default function App() {
   const [isFontsLoaded] = useFonts({
     Roboto_400Regular,
     Roboto_700Bold,
   });
 
-  if (!isFontsLoaded) {
-    return null;
-  }
-
   return (
-    <NativeBaseProvider>
+    <NativeBaseProvider theme={theme}>
       <StatusBar style="light" translucent />
-      <View />
+      {isFontsLoaded ? <View /> : <Loading />}
     </NativeBaseProvider>
   );
 }
