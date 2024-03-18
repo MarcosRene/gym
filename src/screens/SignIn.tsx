@@ -6,7 +6,7 @@ import { Button } from '@/components/Button';
 
 import { AuthNavigatorRoutesProps } from '@/routes/auth.routes';
 
-// import LogoSvg from '@/assets/logo.svg';
+import LogoSvg from '@/assets/logo.svg';
 import backgrounImage from '@/assets/background.png';
 
 export function SignIn() {
@@ -31,7 +31,7 @@ export function SignIn() {
         />
 
         <Center my={24}>
-          {/* <LogoSvg /> */}
+          <LogoSvg />
 
           <Text fontSize="sm" color="gray.100">
             Treine sua mente e o seu corpo

@@ -4,7 +4,7 @@ import { Center, Heading, Image, ScrollView, Text, VStack } from 'native-base';
 import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
 
-// import LogoSvg from '@/assets/logo.svg';
+import LogoSvg from '@/assets/logo.svg';
 import backgrounImage from '@/assets/background.png';
 
 export function SignUp() {
@@ -29,7 +29,7 @@ export function SignUp() {
         />
 
         <Center my={24}>
-          {/* <LogoSvg /> */}
+          <LogoSvg />
 
           <Text fontSize="sm" color="gray.100">
             Treine sua mente e o seu corpo
