@@ -10,6 +10,8 @@ import { NativeBaseProvider } from 'native-base';
 
 import { Loading } from '@/components/Loading';
 
+import { SignIn } from '@/screens/SignIn';
+
 import { theme } from '@/theme';
 
 export default function App() {
@@ -21,7 +23,7 @@ export default function App() {
   return (
     <NativeBaseProvider theme={theme}>
       <StatusBar style="light" translucent />
-      {isFontsLoaded ? <View /> : <Loading />}
+      {isFontsLoaded ? <SignIn /> : <Loading />}
     </NativeBaseProvider>
   );
 }
