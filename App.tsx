@@ -4,6 +4,7 @@ import {
   Roboto_400Regular,
   Roboto_700Bold,
 } from '@expo-google-fonts/roboto';
+import { StatusBar } from 'expo-status-bar';
 
 export default function App() {
   const [isFontsLoaded] = useFonts({
@@ -16,8 +17,18 @@ export default function App() {
   }
 
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text style={{ fontFamily: 'Roboto_700Bold' }}>Hello World</Text>
+    <View
+      style={{
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#202020',
+      }}
+    >
+      <StatusBar style="light" translucent />
+      <Text style={{ fontFamily: 'Roboto_700Bold', color: '#FFFFFF' }}>
+        Hello World
+      </Text>
     </View>
   );
 }
