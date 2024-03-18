@@ -1,10 +1,12 @@
-import { Text, View } from 'react-native';
+import React from 'react';
+import { View } from 'react-native';
 import {
   useFonts,
   Roboto_400Regular,
   Roboto_700Bold,
 } from '@expo-google-fonts/roboto';
 import { StatusBar } from 'expo-status-bar';
+import { NativeBaseProvider } from 'native-base';
 
 export default function App() {
   const [isFontsLoaded] = useFonts({
@@ -17,18 +19,9 @@ export default function App() {
   }
 
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: '#202020',
-      }}
-    >
+    <NativeBaseProvider>
       <StatusBar style="light" translucent />
-      <Text style={{ fontFamily: 'Roboto_700Bold', color: '#FFFFFF' }}>
-        Hello World
-      </Text>
-    </View>
+      <View />
+    </NativeBaseProvider>
   );
 }
