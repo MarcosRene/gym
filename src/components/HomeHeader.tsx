@@ -4,7 +4,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { UserPhoto } from './UserPhoto';
 import { TouchableOpacity } from 'react-native';
 
-export default function HomeHeader() {
+export function HomeHeader() {
   return (
     <HStack pt={16} pb={5} px={8} bg="gray.600" alignItems="center">
       <UserPhoto
