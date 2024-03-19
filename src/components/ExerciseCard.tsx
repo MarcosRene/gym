@@ -20,8 +20,8 @@ export function ExerciseCard({ ...rest }: ExerciseCard) {
             uri: 'https://www.origym.com.br/midia/remada-unilateral-3.jpg',
           }}
           alt="Imagem do exercício"
-          height={16}
-          width={16}
+          h={16}
+          w={16}
           mr={4}
           rounded="md"
           resizeMode="center"

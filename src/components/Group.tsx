@@ -8,8 +8,8 @@ type GroupProps = IPressableProps & {
 export function Group({ name, isActive = false, ...rest }: GroupProps) {
   return (
     <Pressable
-      height={10}
-      width={24}
+      h={10}
+      w={24}
       mr={3}
       bg="gray.600"
       rounded="md"
