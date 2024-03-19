@@ -55,7 +55,7 @@ export function Home() {
 
       <VStack flex={1} px={8}>
         <HStack mb={5} justifyContent="space-between">
-          <Heading fontSize="md" color="gray.200">
+          <Heading fontSize="md" fontFamily="heading" color="gray.200">
             Exercícios
           </Heading>
 

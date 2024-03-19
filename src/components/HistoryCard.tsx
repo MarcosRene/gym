@@ -15,6 +15,7 @@ export function HistoryCard() {
       <VStack mr={5} flex={1}>
         <Heading
           fontSize="sm"
+          fontFamily="heading"
           textTransform="capitalize"
           color="white"
           numberOfLines={1}

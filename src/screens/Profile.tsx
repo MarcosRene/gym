@@ -102,6 +102,7 @@ export function Profile() {
             mt={12}
             mb={2}
             fontSize="md"
+            fontFamily="heading"
             color="gray.200"
             alignSelf="flex-start"
           >
