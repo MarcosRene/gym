@@ -48,7 +48,8 @@ export function Home() {
         horizontal
         showsHorizontalScrollIndicator={false}
         _contentContainerStyle={{ px: 8 }}
-        maxHeight={10}
+        maxH={10}
+        minH={10}
         my={10}
       />
 
