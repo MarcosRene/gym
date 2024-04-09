@@ -3,11 +3,17 @@ import { Box } from 'native-base';
 
 import { useAuth } from '@/hooks/useAuth';
 
+import { Loading } from '@/components/Loading';
+
 import { AppRoutes } from './app.routes';
 import { AuthRoutes } from './auth.routes';
 
 export function Routes() {
-  const { user } = useAuth();
+  const { user, isLoadingUserStorageData } = useAuth();
+
+  if (isLoadingUserStorageData) {
+    return <Loading />;
+  }
 
   return (
     <Box flex={1} bg="gray.700">
