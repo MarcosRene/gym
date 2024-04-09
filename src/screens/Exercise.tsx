@@ -17,6 +17,7 @@ import { Feather } from '@expo/vector-icons';
 import { api } from '@/services/api';
 
 import { Button } from '@/components/Button';
+import { Loading } from '@/components/Loading';
 
 import { AppError } from '@/utils/AppError';
 
@@ -43,6 +44,7 @@ export function Exercise() {
   const toast = useToast();
 
   const [execise, setExercise] = useState<ExercisesDTO>({} as ExercisesDTO);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { exerciseId } = params as RouteParamsProps;
 
@@ -52,6 +54,8 @@ export function Exercise() {
 
   async function fetchExerciseDetails() {
     try {
+      setIsLoading(true);
+
       const { data: dataReponseExercise } = await api.get(
         `/exercises/${exerciseId}`
       );
@@ -68,6 +72,8 @@ export function Exercise() {
         placement: 'top',
         bgColor: 'red.500',
       });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -106,45 +112,50 @@ export function Exercise() {
           </HStack>
         </HStack>
       </VStack>
-      <ScrollView>
-        <VStack p={8}>
-          <Box mb={3} rounded="lg" overflow="hidden">
-            <Image
-              w="full"
-              h={80}
-              source={{
-                uri: DemoURL(execise?.demo),
-              }}
-              alt="Imagem do exercício"
-              resizeMode="cover"
-            />
-          </Box>
 
-          <Box pb={4} px={4} bg="gray.600" rounded="md">
-            <HStack
-              mb={6}
-              mt={5}
-              alignItems="center"
-              justifyContent="space-around"
-            >
-              <HStack>
-                <SeriesSvg />
-                <Text ml={2} color="gray.200">
-                  {execise.series} séries
-                </Text>
-              </HStack>
-              <HStack>
-                <RepetitionsSvg />
-                <Text ml={2} color="gray.200">
-                  {execise.repetitions} repetições
-                </Text>
-              </HStack>
-            </HStack>
+      {isLoading ? (
+        <Loading />
+      ) : (
+        <ScrollView>
+          <VStack p={8}>
+            <Box mb={3} rounded="lg" overflow="hidden">
+              <Image
+                w="full"
+                h={80}
+                source={{
+                  uri: DemoURL(execise.demo),
+                }}
+                alt="Imagem do exercício"
+                resizeMode="cover"
+              />
+            </Box>
 
-            <Button title="Marcar como realizado" />
-          </Box>
-        </VStack>
-      </ScrollView>
+            <Box pb={4} px={4} bg="gray.600" rounded="md">
+              <HStack
+                mb={6}
+                mt={5}
+                alignItems="center"
+                justifyContent="space-around"
+              >
+                <HStack>
+                  <SeriesSvg />
+                  <Text ml={2} color="gray.200">
+                    {execise.series} séries
+                  </Text>
+                </HStack>
+                <HStack>
+                  <RepetitionsSvg />
+                  <Text ml={2} color="gray.200">
+                    {execise.repetitions} repetições
+                  </Text>
+                </HStack>
+              </HStack>
+
+              <Button title="Marcar como realizado" />
+            </Box>
+          </VStack>
+        </ScrollView>
+      )}
     </VStack>
   );
 }
