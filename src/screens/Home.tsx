@@ -25,8 +25,8 @@ export function Home() {
   const [groupSelected, setGroupSelected] = useState('costas');
   const [isLoading, setIsLoading] = useState(true);
 
-  function handleOpenExerciseDetails() {
-    navigate('exercise');
+  function handleOpenExerciseDetails(exerciseId: string) {
+    navigate('exercise', { exerciseId });
   }
 
   async function fetchGroups() {
@@ -124,7 +124,7 @@ export function Home() {
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
               <ExerciseCard
-                onPress={handleOpenExerciseDetails}
+                onPress={() => handleOpenExerciseDetails(item.id)}
                 exercise={item}
               />
             )}

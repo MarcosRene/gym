@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react';
 import { TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import {
   Box,
   HStack,
@@ -9,23 +10,70 @@ import {
   ScrollView,
   Text,
   VStack,
+  useToast,
 } from 'native-base';
 import { Feather } from '@expo/vector-icons';
 
+import { api } from '@/services/api';
+
 import { Button } from '@/components/Button';
 
+import { AppError } from '@/utils/AppError';
+
 import { AppNavigatorRoutesProps } from '@/routes/app.routes';
+
+import { ExercisesDTO } from '@/dtos/ExercisesDTO';
 
 import BodySvg from '@/assets/body.svg';
 import SeriesSvg from '@/assets/series.svg';
 import RepetitionsSvg from '@/assets/repetitions.svg';
 
+type RouteParamsProps = {
+  exerciseId: string;
+};
+
+const DemoURL = (demo: string) => {
+  return `${api.defaults.baseURL}/exercise/demo/${demo}`;
+};
+
 export function Exercise() {
+  const { params } = useRoute();
   const { goBack } = useNavigation<AppNavigatorRoutesProps>();
+
+  const toast = useToast();
+
+  const [execise, setExercise] = useState<ExercisesDTO>({} as ExercisesDTO);
+
+  const { exerciseId } = params as RouteParamsProps;
 
   function handleGoBack() {
     goBack();
   }
+
+  async function fetchExerciseDetails() {
+    try {
+      const { data: dataReponseExercise } = await api.get(
+        `/exercises/${exerciseId}`
+      );
+
+      setExercise(dataReponseExercise);
+    } catch (error) {
+      const isAppError = error instanceof AppError;
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível carregar os detalhes do exercício.';
+
+      toast.show({
+        title,
+        placement: 'top',
+        bgColor: 'red.500',
+      });
+    }
+  }
+
+  useEffect(() => {
+    fetchExerciseDetails();
+  }, [exerciseId]);
 
   return (
     <VStack flex={1} bg="gray.700">
@@ -46,31 +94,31 @@ export function Exercise() {
             color="gray.100"
             flexShrink={1}
           >
-            Puxada frontal
+            {execise.name}
           </Heading>
 
           <HStack alignItems="center">
             <BodySvg />
 
             <Text ml={1} color="gray.200" textTransform="capitalize">
-              Costas
+              {execise.group}
             </Text>
           </HStack>
         </HStack>
       </VStack>
       <ScrollView>
         <VStack p={8}>
-          <Image
-            w="full"
-            h={80}
-            mb={3}
-            source={{
-              uri: 'https://pratiquefitness.com.br/blog/wp-content/uploads/2023/07/Exercicio-puxada-beneficios-variacoes-e-como-fazer-2.jpg',
-            }}
-            alt="Imagem do exercício"
-            resizeMode="cover"
-            rounded="lg"
-          />
+          <Box mb={3} rounded="lg" overflow="hidden">
+            <Image
+              w="full"
+              h={80}
+              source={{
+                uri: DemoURL(execise?.demo),
+              }}
+              alt="Imagem do exercício"
+              resizeMode="cover"
+            />
+          </Box>
 
           <Box pb={4} px={4} bg="gray.600" rounded="md">
             <HStack
@@ -82,13 +130,13 @@ export function Exercise() {
               <HStack>
                 <SeriesSvg />
                 <Text ml={2} color="gray.200">
-                  3 séries
+                  {execise.series} séries
                 </Text>
               </HStack>
               <HStack>
                 <RepetitionsSvg />
                 <Text ml={2} color="gray.200">
-                  12 repetições
+                  {execise.repetitions} repetições
                 </Text>
               </HStack>
             </HStack>
