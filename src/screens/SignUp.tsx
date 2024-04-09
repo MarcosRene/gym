@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import {
   Center,
@@ -14,6 +15,8 @@ import * as yup from 'yup';
 
 import { Input } from '@/components/Input';
 import { Button } from '@/components/Button';
+
+import { useAuth } from '@/hooks/useAuth';
 
 import { api } from '@/services/api';
 
@@ -43,7 +46,9 @@ const SignUpSchema = yup.object({
 });
 
 export function SignUp() {
-  const toast = useToast();
+  const { goBack } = useNavigation();
+
+  const { signIn } = useAuth();
 
   const {
     control,
@@ -53,7 +58,9 @@ export function SignUp() {
     resolver: yupResolver(SignUpSchema),
   });
 
-  const { goBack } = useNavigation();
+  const toast = useToast();
+
+  const [isLoading, setIsLoading] = useState(false);
 
   function handleGoBack() {
     goBack();
@@ -61,11 +68,15 @@ export function SignUp() {
 
   async function handleSignUp({ name, email, password }: FormDataProps) {
     try {
-      const { data } = await api.post('/users', {
+      setIsLoading(true);
+
+      await api.post('/users', {
         name,
         email,
         password,
       });
+
+      await signIn(email, password);
     } catch (error) {
       const isAppError = error instanceof AppError;
       const title = isAppError
@@ -77,6 +88,8 @@ export function SignUp() {
         placement: 'top',
         bgColor: 'red.500',
       });
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -168,6 +181,7 @@ export function SignUp() {
           <Button
             title="Criar e acessar"
             onPress={handleSubmit(handleSignUp)}
+            isLoading={isLoading}
           />
         </Center>
 
