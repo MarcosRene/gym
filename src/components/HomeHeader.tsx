@@ -4,9 +4,14 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 import { useAuth } from '@/hooks/useAuth';
 
+import { api } from '@/services/api';
+
 import { UserPhoto } from './UserPhoto';
 
 import defaultUserPhotoImg from '@/assets/userPhotoDefault.png';
+
+const avatarURL = (avatar: string) =>
+  `${api.defaults.baseURL}/avatar/${avatar}`;
 
 export function HomeHeader() {
   const { user, signOut } = useAuth();
@@ -15,9 +20,7 @@ export function HomeHeader() {
     <HStack pt={16} pb={5} px={8} bg="gray.600" alignItems="center">
       <UserPhoto
         source={
-          user?.avatar
-            ? { uri: 'https://github.com/MarcosRene.png' }
-            : defaultUserPhotoImg
+          user.avatar ? { uri: avatarURL(user.avatar) } : defaultUserPhotoImg
         }
         alt="Imagem do usuário"
         size={16}

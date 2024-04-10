@@ -26,6 +26,8 @@ import { Input } from '@/components/Input';
 
 import { AppError } from '@/utils/AppError';
 
+import defaultUserPhotoImg from '@/assets/userPhotoDefault.png';
+
 const PHOTO_SIZE = 33;
 
 type FormDataProps = {
@@ -57,6 +59,9 @@ const profileSchema = yup.object({
           .transform((value) => (!!value ? value : null)),
     }),
 });
+
+const avatarURL = (avatar: string) =>
+  `${api.defaults.baseURL}/avatar/${avatar}`;
 
 export function Profile() {
   const toast = useToast();
@@ -105,7 +110,42 @@ export function Profile() {
         });
       }
 
-      setUserPhoto(photoSelected.assets[0]?.uri);
+      const fileExtension = photoSelected.assets[0]?.uri.split('.').pop();
+
+      const photoFile = {
+        name: `${user.name}.${fileExtension}`.replace(' ', '-').toLowerCase(),
+        uri: photoSelected.assets[0]?.uri,
+        type: `${photoSelected.assets[0]?.type}/${fileExtension}`,
+      } as any;
+
+      const userPhotoUploadForm = new FormData();
+
+      userPhotoUploadForm.append('avatar', photoFile);
+
+      const { data: avatarUpdatedResponse } = await api.patch(
+        '/users/avatar',
+        userPhotoUploadForm,
+        {
+          headers: {
+            'Content-type': 'multipart/form-data',
+          },
+        }
+      );
+
+      const userUpdated = {
+        ...user,
+        avatar: avatarUpdatedResponse.avatar,
+      };
+
+      await updateUserProfile(userUpdated);
+
+      toast.show({
+        title: 'Foto atualizada!',
+        placement: 'top',
+        bgColor: 'green.700',
+      });
+
+      setUserPhoto(user?.avatar);
     } catch (error) {
       console.log(error);
     } finally {
@@ -158,7 +198,11 @@ export function Profile() {
             />
           ) : (
             <UserPhoto
-              source={{ uri: userPhoto }}
+              source={
+                user.avatar
+                  ? { uri: avatarURL(user.avatar) }
+                  : defaultUserPhotoImg
+              }
               alt="Imagem do usuário"
               size={PHOTO_SIZE}
             />
