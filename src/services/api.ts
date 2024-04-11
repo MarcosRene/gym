@@ -1,7 +1,11 @@
 import axios, { AxiosError, AxiosInstance } from 'axios';
 
 import { AppError } from '@/utils/AppError';
-import { storageAuthTokenGet } from '@/storage/storageAuthToken';
+import {
+  StorageAuthTokenProps,
+  storageAuthTokenGet,
+  storageAuthTokenSave,
+} from '@/storage/storageAuthToken';
 
 type SignOut = () => void;
 
@@ -13,6 +17,8 @@ type PromiseType = {
 type APIInstanceProps = AxiosInstance & {
   registerInterceptTokenManager: (signOut: SignOut) => () => void;
 };
+
+type DataAuthResponse = StorageAuthTokenProps;
 
 const api = axios.create({
   baseURL: 'http://192.168.0.11:3333',
@@ -30,9 +36,9 @@ api.registerInterceptTokenManager = (signOut) => {
           requestError.response.data?.message === 'token.expired' ||
           requestError.response.data?.message === 'token.invalid'
         ) {
-          const { refresh_token } = await storageAuthTokenGet();
+          const { refresh_token: refreshToken } = await storageAuthTokenGet();
 
-          if (!refresh_token) {
+          if (!refreshToken) {
             signOut();
 
             return Promise.reject(requestError);
@@ -57,9 +63,35 @@ api.registerInterceptTokenManager = (signOut) => {
           }
 
           isRefreshing = true;
-        }
 
-        signOut();
+          return new Promise(async (resolve, reject) => {
+            try {
+              const { data } = await api.post<DataAuthResponse>(
+                '/sessions/refresh-token',
+                {
+                  refreshToken,
+                }
+              );
+
+              const { token, refresh_token } = data;
+
+              await storageAuthTokenSave({
+                token,
+                refresh_token,
+              });
+            } catch (error: any) {
+              failedQueue.forEach((request) => {
+                request.onFailure(error);
+              });
+
+              signOut();
+              reject(error);
+            } finally {
+              isRefreshing = false;
+              failedQueue = [];
+            }
+          });
+        }
       }
 
       if (requestError.response && requestError.response.data) {
