@@ -24,7 +24,7 @@ const api = axios.create({
   baseURL: 'http://192.168.0.11:3333',
 }) as APIInstanceProps;
 
-let failedQueue: Array<PromiseType> = [];
+let failedQueued: Array<PromiseType> = [];
 let isRefreshing = false;
 
 api.registerInterceptTokenManager = (signOut) => {
@@ -36,9 +36,9 @@ api.registerInterceptTokenManager = (signOut) => {
           requestError.response.data?.message === 'token.expired' ||
           requestError.response.data?.message === 'token.invalid'
         ) {
-          const { refresh_token: refreshToken } = await storageAuthTokenGet();
+          const { refresh_token } = await storageAuthTokenGet();
 
-          if (!refreshToken) {
+          if (!refresh_token) {
             signOut();
 
             return Promise.reject(requestError);
@@ -48,7 +48,7 @@ api.registerInterceptTokenManager = (signOut) => {
 
           if (isRefreshing) {
             return new Promise((resolve, reject) => {
-              failedQueue.push({
+              failedQueued.push({
                 onSuccess: (token) => {
                   originalRequestConfig.headers = {
                     Authorization: `Bearer ${token}`,
@@ -69,18 +69,36 @@ api.registerInterceptTokenManager = (signOut) => {
               const { data } = await api.post<DataAuthResponse>(
                 '/sessions/refresh-token',
                 {
-                  refreshToken,
+                  refresh_token,
                 }
               );
 
-              const { token, refresh_token } = data;
-
               await storageAuthTokenSave({
-                token,
-                refresh_token,
+                token: data.token,
+                refresh_token: data.refresh_token,
               });
+
+              if (originalRequestConfig.data) {
+                originalRequestConfig.data = JSON.parse(
+                  originalRequestConfig.data
+                );
+              }
+
+              originalRequestConfig.headers = {
+                Authorization: `Bearer ${data.token}`,
+              };
+
+              api.defaults.headers.common[
+                'Authorization'
+              ] = `Bearer ${data.token}`;
+
+              failedQueued.forEach((request) => {
+                request.onSuccess(data.token);
+              });
+
+              resolve(api(originalRequestConfig));
             } catch (error: any) {
-              failedQueue.forEach((request) => {
+              failedQueued.forEach((request) => {
                 request.onFailure(error);
               });
 
@@ -88,7 +106,7 @@ api.registerInterceptTokenManager = (signOut) => {
               reject(error);
             } finally {
               isRefreshing = false;
-              failedQueue = [];
+              failedQueued = [];
             }
           });
         }
